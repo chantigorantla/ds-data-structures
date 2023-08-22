@@ -1,0 +1,126 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MAX_VERTICES 100
+
+struct Node {
+    int vertex;
+    struct Node* next;
+};
+
+struct Graph {
+    int numVertices;
+    struct Node** adjLists;
+    bool* visited;
+};
+
+// Function to create a new adjacency list node
+struct Node* createNode(int vertex) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex = vertex;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to create a graph with a given number of vertices
+struct Graph* createGraph(int vertices) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->numVertices = vertices;
+    graph->adjLists = (struct Node**)malloc(vertices * sizeof(struct Node));
+    graph->visited = (bool*)malloc(vertices * sizeof(bool));
+
+    for (int i = 0; i < vertices; i++) {
+        graph->adjLists[i] = NULL;
+        graph->visited[i] = false;
+    }
+
+    return graph;
+}
+
+// Function to add an edge to the graph
+void addEdge(struct Graph* graph, int src, int dest) {
+    struct Node* newNode = createNode(dest);
+    newNode->next = graph->adjLists[src];
+    graph->adjLists[src] = newNode;
+
+    // For an undirected graph, add the reverse edge as well
+    newNode = createNode(src);
+    newNode->next = graph->adjLists[dest];
+    graph->adjLists[dest] = newNode;
+}
+
+// Breadth-First Search (BFS)
+void BFS(struct Graph* graph, int startVertex) {
+    int queue[MAX_VERTICES];
+    int front = 0, rear = 0;
+
+    // Mark the start vertex as visited and enqueue it
+    graph->visited[startVertex] = true;
+    queue[rear++] = startVertex;
+
+    printf("Breadth-First Traversal: ");
+
+    while (front < rear) {
+        int currentVertex = queue[front++];
+        printf("%d ", currentVertex);
+
+        struct Node* temp = graph->adjLists[currentVertex];
+        while (temp != NULL) {
+            int adjVertex = temp->vertex;
+            if (!(graph->visited[adjVertex])) {
+                graph->visited[adjVertex] = true;
+                queue[rear++] = adjVertex;
+            }
+            temp = temp->next;
+        }
+    }
+
+    printf("\n");
+}
+
+// Depth-First Search (DFS)
+void DFS(struct Graph* graph, int vertex) {
+    graph->visited[vertex] = true;
+    printf("%d ", vertex);
+
+    struct Node* temp = graph->adjLists[vertex];
+    while (temp != NULL) {
+        int adjVertex = temp->vertex;
+        if (!(graph->visited[adjVertex])) {
+            DFS(graph, adjVertex);
+        }
+        temp = temp->next;
+    }
+}
+
+int main() {
+		printf("name : srikrishna\n");
+	printf("regno : 192210525\n");
+    int vertices = 6; // Number of vertices in the graph
+    struct Graph* graph = createGraph(vertices);
+
+    // Add edges to the graph
+    addEdge(graph, 0, 1);
+    addEdge(graph, 0, 2);
+    addEdge(graph, 1, 3);
+    addEdge(graph, 1, 4);
+    addEdge(graph, 2, 4);
+    addEdge(graph, 3, 5);
+    addEdge(graph, 4, 5);
+
+    int startVertex = 0; // Starting vertex for traversal
+
+    printf("Starting from vertex %d:\n", startVertex);
+    printf("Depth-First Traversal: ");
+    DFS(graph, startVertex);
+
+    // Reset visited flags for BFS
+    for (int i = 0; i < vertices; i++) {
+        graph->visited[i] = false;
+    }
+
+    BFS(graph, startVertex);
+
+    return 0;
+}
