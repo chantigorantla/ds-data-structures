@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define V 5 // Number of vertices in the graph
+
+bool visited[V]; // To keep track of visited vertices
+
+// A structure to represent an adjacency list node
+struct Node {
+    int vertex;
+    struct Node* next;
+};
+
+// Function to create a new adjacency list node
+struct Node* createNode(int vertex) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex = vertex;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to add an edge to the adjacency list
+void addEdge(struct Node* adjList[], int src, int dest) {
+    struct Node* newNode = createNode(dest);
+    newNode->next = adjList[src];
+    adjList[src] = newNode;
+}
+
+// Function to perform Depth-First Search and print the valid path
+bool DFS(struct Node* adjList[], int src, int dest) {
+    if (src == dest) {
+        printf("%d ", src);
+        return true;
+    }
+
+    visited[src] = true;
+
+    struct Node* current = adjList[src];
+    while (current != NULL) {
+        int neighbor = current->vertex;
+        if (!visited[neighbor] && DFS(adjList, neighbor, dest)) {
+            printf("%d ", src);
+            return true;
+        }
+        current = current->next;
+    }
+
+    return false;
+}
+
+int main() {
+		printf("name : sri krisna\n");
+	printf("regno : 192210525\n");
+    struct Node* adjList[V];
+    for (int i = 0; i < V; i++) {
+        adjList[i] = NULL;
+    }
+
+    // Add edges to the graph
+    addEdge(adjList, 0, 1);
+    addEdge(adjList, 0, 2);
+    addEdge(adjList, 1, 2);
+    addEdge(adjList, 1, 3);
+    addEdge(adjList, 2, 4);
+    addEdge(adjList, 3, 4);
+
+    int source = 0;
+    int destination = 4;
+
+    printf("Valid Path from %d to %d: ", source, destination);
+    if (!DFS(adjList, source, destination)) {
+        printf("No valid path found.");
+    }
+
+    return 0;
+}
