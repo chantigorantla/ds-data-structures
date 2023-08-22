@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MAX_VERTICES 100
+
+struct Node {
+    int vertex;
+    struct Node* next;
+};
+
+struct Graph {
+    int numVertices;
+    struct Node** adjLists;
+    bool* visited;
+};
+
+// Function to create a new adjacency list node
+struct Node* createNode(int vertex) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex = vertex;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to create a graph with a given number of vertices
+struct Graph* createGraph(int vertices) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->numVertices = vertices;
+    graph->adjLists = (struct Node*)malloc(vertices * sizeof(struct Node));
+    graph->visited = (bool*)malloc(vertices * sizeof(bool));
+
+    for (int i = 0; i < vertices; i++) {
+        graph->adjLists[i] = NULL;
+        graph->visited[i] = false;
+    }
+
+    return graph;
+}
+
+// Function to add an edge to the graph
+void addEdge(struct Graph* graph, int src, int dest) {
+    struct Node* newNode = createNode(dest);
+    newNode->next = graph->adjLists[src];
+    graph->adjLists[src] = newNode;
+}
+
+// Function to perform DFS and generate topological order
+void topologicalSort(struct Graph* graph, int vertex, int stack[], int* stackIndex) {
+    graph->visited[vertex] = true;
+    struct Node* temp = graph->adjLists[vertex];
+
+    while (temp != NULL) {
+        int adjVertex = temp->vertex;
+        if (!(graph->visited[adjVertex])) {
+            topologicalSort(graph, adjVertex, stack, stackIndex);
+        }
+        temp = temp->next;
+    }
+
+    stack[(*stackIndex)] = vertex;
+    (*stackIndex)++;
+}
+
+// Function to perform topological sorting
+void performTopologicalSort(struct Graph* graph) {
+    int stack[MAX_VERTICES];
+    int stackIndex = 0;
+
+    for (int i = 0; i < graph->numVertices; i++) {
+        if (!(graph->visited[i])) {
+            topologicalSort(graph, i, stack, &stackIndex);
+        }
+    }
+
+    printf("Topological Order: ");
+    for (int i = stackIndex - 1; i >= 0; i--) {
+        printf("%d ", stack[i]);
+    }
+}
+
+int main() {
+		printf("name : sri krishna\n");
+	printf("regno : 192210525\n");
+    int vertices = 6; // Number of vertices in the graph
+    struct Graph* graph = createGraph(vertices);
+
+    addEdge(graph, 5, 2);
+    addEdge(graph, 5, 0);
+    addEdge(graph, 4, 0);
+    addEdge(graph, 4, 1);
+    addEdge(graph, 2, 3);
+    addEdge(graph, 3, 1);
+
+    performTopologicalSort(graph);
+
+    return 0;
+}
